@@ -1,3 +1,9 @@
+import { PokemonProvider } from '@/context/PokemonContext';
+
 export default function Home() {
-  return <div>deneme</div>;
+  return (
+    <PokemonProvider>
+      <div></div>
+    </PokemonProvider>
+  );
 }
