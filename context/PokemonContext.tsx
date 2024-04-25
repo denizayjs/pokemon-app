@@ -6,6 +6,7 @@ import React, {
   useEffect,
   ReactNode,
   useContext,
+  useMemo,
 } from 'react';
 import axios from 'axios';
 import { getPokemons } from '../utils/fetchPokemon';
@@ -22,7 +23,7 @@ interface PokemonContextProps {
 }
 
 const initialState = {
-  pokemonList: null,
+  pokemonList: [],
   error: null,
   isLoading: false,
 };
@@ -52,17 +53,23 @@ const PokemonProvider = ({ children }: { children: ReactNode }) => {
     getPokemonList();
   }, []);
 
+  const value = useMemo(() => {
+    return {
+      pokemonList,
+      error,
+      isLoading,
+    };
+  }, [pokemonList, error, isLoading]);
+
   return (
-    <PokemonContext.Provider value={{ pokemonList, error, isLoading }}>
-      {children}
-    </PokemonContext.Provider>
+    <PokemonContext.Provider value={value}>{children}</PokemonContext.Provider>
   );
 };
 
 const usePokemonContext = () => {
   const context = useContext(PokemonContext);
   if (!context) {
-    return;
+    throw new Error('please use in PokemonProvider');
   }
 
   return context;

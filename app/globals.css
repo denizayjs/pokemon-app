@@ -4,4 +4,5 @@
 
 body {
   background: linear-gradient(to left, #8e2de2, #4a00e0);
+  @apply py-10 px-40 relative;
 }
