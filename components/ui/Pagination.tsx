@@ -1,16 +1,22 @@
 import { useMemo } from 'react';
-import { cn } from '@/utils/classNames';
+import { cn } from '@/utils/classnames';
 
 type PaginationProps = {
   currentPage: number;
   numberOfPage: number;
-  onNext: () => void;
-  onPrev: () => void;
-  onSelectPage: (item: number) => void;
+  handleNext: () => void;
+  handlePrev: () => void;
+  handleSelectPage: (item: number) => void;
 };
 
 const Pagination = (props: PaginationProps) => {
-  const { currentPage, numberOfPage, onNext, onPrev, onSelectPage } = props;
+  const {
+    currentPage,
+    numberOfPage,
+    handleNext,
+    handlePrev,
+    handleSelectPage,
+  } = props;
 
   const pageList = useMemo(() => {
     var result = [];
@@ -27,7 +33,7 @@ const Pagination = (props: PaginationProps) => {
         <div className='flex justify-center'>
           <nav className='flex space-x-2' aria-label='Pagination'>
             <button
-              onClick={onPrev}
+              onClick={handlePrev}
               className='relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-500 to-indigo-500 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10'
             >
               Previous
@@ -36,7 +42,7 @@ const Pagination = (props: PaginationProps) => {
             {pageList.map((item) => (
               <span
                 onClick={() => {
-                  onSelectPage(item);
+                  handleSelectPage(item);
                 }}
                 key={item}
                 className={cn(
@@ -49,7 +55,7 @@ const Pagination = (props: PaginationProps) => {
             ))}
 
             <button
-              onClick={onNext}
+              onClick={handleNext}
               className='relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-500 to-indigo-500 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10'
             >
               Next

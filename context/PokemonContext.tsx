@@ -9,8 +9,8 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import axios from 'axios';
-import { getPokemons } from '../utils/fetchPokemon';
+
+import { getPokemons, getPokemonByName } from '../utils/fetchPokemon';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 interface Pokemon {
@@ -23,19 +23,25 @@ interface PokemonContextProps {
   error: string | null;
   isLoading: boolean;
   currentPage: number;
+  currentPokemon: string | null;
   nextPage: () => void;
   prevPage: () => void;
   setInitialPage: (item: number) => void;
+  selectedPokemon: (name: string | null) => void;
+  pokemonDetail: any | null;
 }
 
 const initialState = {
   pokemonList: [],
+  currentPokemon: null,
   error: null,
   isLoading: false,
   currentPage: 1,
   nextPage: () => {},
   prevPage: () => {},
   setInitialPage: (item: number) => {},
+  selectedPokemon: (item: string | null) => {},
+  pokemonDetail: null,
 };
 
 export const PokemonContext = createContext<PokemonContextProps>(initialState);
@@ -45,24 +51,13 @@ const PokemonProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPokemon, setCurrentPokemon] = useState<string | null>(null);
+
+  const [pokemonDetail, setPokemonDetail] = useState<any | null>(null);
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-
-  const getPokemonList = async (pageNumber: number) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const data = await getPokemons(pageNumber);
-      setPokemonList(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -74,7 +69,9 @@ const PokemonProvider = ({ children }: { children: ReactNode }) => {
     [searchParams],
   );
 
-  const pageNumber = searchParams.get('pageNumber');
+  const selectedPokemon = (name: string | null) => {
+    setCurrentPokemon(name);
+  };
 
   const nextPage = () => {
     setCurrentPage(currentPage + 1);
@@ -88,7 +85,41 @@ const PokemonProvider = ({ children }: { children: ReactNode }) => {
     setCurrentPage(page);
   };
 
+  const getPokemonDetail = async (name: string) => {
+    try {
+      const data = await getPokemonByName(name);
+      setPokemonDetail(data);
+    } catch (error) {
+      console.error('Error fetching Pokemon data:', error);
+      throw error;
+    }
+  };
+
+  const getPokemonList = async (pageNumber: number) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await getPokemons(pageNumber);
+      setPokemonList(data);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
+    if (!currentPokemon) {
+      return;
+    }
+
+    getPokemonDetail(currentPokemon);
+  }, [currentPokemon]);
+
+  useEffect(() => {
+    if (!currentPage) {
+      return;
+    }
     router.push(
       pathname + '?' + createQueryString('pageNumber', String(currentPage)),
     );
@@ -104,6 +135,9 @@ const PokemonProvider = ({ children }: { children: ReactNode }) => {
       nextPage,
       prevPage,
       setInitialPage,
+      selectedPokemon,
+      pokemonDetail,
+      currentPokemon,
     };
   }, [
     pokemonList,
@@ -113,6 +147,9 @@ const PokemonProvider = ({ children }: { children: ReactNode }) => {
     nextPage,
     prevPage,
     setInitialPage,
+    selectedPokemon,
+    pokemonDetail,
+    currentPokemon,
   ]);
 
   return (
