@@ -14,6 +14,9 @@ const CollectionBox = () => {
 
   const pageNumber = searchParams.get('pageNumber');
 
+  const numOfPage = Number(process.env.NEXT_PUBLIC_NUM_OF_PAGINATION);
+  console.log(numOfPage);
+
   useEffect(() => {
     if (pageNumber) {
       setInitialPage(Number(pageNumber));
@@ -33,10 +36,10 @@ const CollectionBox = () => {
         </div>
       ))}
       <Pagination
-        numberOfPage={10}
+        numberOfPage={numOfPage}
         currentPage={currentPage}
         handleNext={() => {
-          if (currentPage < 10) {
+          if (currentPage < numOfPage) {
             nextPage();
           }
         }}
